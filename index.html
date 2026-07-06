@@ -2,69 +2,297 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>BODA IPTV Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 مشغل كأس العالم لـ IPTV 🏆</title>
+    <!-- مكتبة مشغل الفيديو الشهيرة -->
+    <link href="https://zencdn.net" rel="stylesheet" />
+    <!-- خطوط جوجل الاحترافية -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="family">
+
     <style>
-        body { background: #121212; color: #fff; }
-        .sidebar { height: 100vh; overflow-y: auto; background: #1e1e1e; }
-        .channel-btn { width: 100%; text-align: right; margin-bottom: 5px; border-radius: 0; }
-        #video-player { width: 100%; height: 50vh; }
+        :root {
+            --wc-maroon: #56042C; /* العنابي الرسمي لكأس العالم */
+            --wc-gold: #D4AF37;   /* الذهبي الملكي */
+            --wc-dark: #1e0210;   /* العنابي الداكن للخلفيات */
+            --wc-card: #2d071b;   /* لون القوائم والبطاقات */
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Cairo', sans-serif; 
+        }
+
+        body { 
+            background-color: var(--wc-dark); 
+            color: #ffffff; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* الهيدر الاحترافي */
+        header { 
+            background: linear-gradient(135deg, var(--wc-maroon), #2d0016);
+            padding: 15px 20px; 
+            text-align: center; 
+            border-bottom: 3px solid var(--wc-gold); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        header h1 span {
+            color: var(--wc-gold);
+        }
+
+        .wc-logo {
+            width: 45px;
+            height: auto;
+            filter: drop-shadow(0px 2px 5px rgba(0,0,0,0.5));
+        }
+
+        /* الحاوية الرئيسية للتجاوب */
+        .main-container { 
+            display: flex; 
+            flex: 1; 
+            height: calc(100vh - 80px); 
+            overflow: hidden; 
+        }
+
+        /* منطقة المشغل */
+        .player-container { 
+            flex: 2; 
+            background-color: #000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            border: 2px solid #2d071b;
+        }
+
+        .video-js { 
+            width: 100% !important; 
+            height: 100% !important; 
+        }
+
+        /* تعديل ألوان أزرار مشغل الفيديو لتبدو ذهبية */
+        .vjs-default-skin .vjs-big-play-button {
+            background-color: rgba(86, 4, 44, 0.8) !important;
+            border-color: var(--wc-gold) !important;
+            color: var(--wc-gold) !important;
+            border-radius: 50% !important;
+            width: 80px !important;
+            height: 80px !important;
+            line-height: 76px !important;
+            margin-left: -40px !important;
+            margin-top: -40px !important;
+        }
+
+        /* القائمة الجانبية الاستايل الفاجر */
+        .playlist-sidebar { 
+            width: 360px; 
+            background-color: var(--wc-card); 
+            border-right: 3px solid var(--wc-maroon); 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        }
+
+        .search-box { 
+            padding: 15px; 
+            background-color: var(--wc-maroon);
+            border-bottom: 2px solid var(--wc-gold); 
+        }
+
+        .search-box input { 
+            width: 100%; 
+            padding: 10px 15px; 
+            background: rgba(0, 0, 0, 0.4); 
+            border: 1px solid var(--wc-gold); 
+            color: #fff; 
+            border-radius: 30px; 
+            text-align: right; 
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-box input:focus {
+            box-shadow: 0 0 10px var(--wc-gold);
+            background: rgba(0, 0, 0, 0.6); 
+        }
+
+        /* قائمة القنوات */
+        .channels-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            list-style: none; 
+            padding: 10px;
+        }
+
+        /* تخصيص شريط التمرير (Scrollbar) ليناسب الثيم */
+        .channels-list::-webkit-scrollbar { width: 6px; }
+        .channels-list::-webkit-scrollbar-track { background: var(--wc-dark); }
+        .channels-list::-webkit-scrollbar-thumb { background: var(--wc-gold); border-radius: 10px; }
+
+        .channel-item { 
+            padding: 14px 18px; 
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            transition: all 0.3s ease; 
+            margin-bottom: 5px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            font-weight: bold;
+        }
+
+        /* إضافة أيقونة كرة كروية تلقائية قبل اسم كل قناة */
+        .channel-item::before {
+            content: "⚽";
+            font-size: 16px;
+        }
+
+        .channel-item:hover { 
+            background: linear-gradient(90deg, var(--wc-maroon), transparent);
+            transform: translateX(-5px);
+            color: var(--wc-gold);
+        }
+
+        .channel-item.active { 
+            background: linear-gradient(90deg, var(--wc-maroon), var(--wc-card)); 
+            color: var(--wc-gold); 
+            border-right: 5px solid var(--wc-gold);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* رسائل الحالة */
+        .status-msg {
+            padding: 40px 20px;
+            text-align: center;
+            color: #b3a2aa;
+            font-size: 15px;
+        }
+
+        /* 📱 قوالب التجاوب مع الهواتف والأجهزة اللوحية (Media Queries) */
+        @media (max-width: 992px) {
+            .main-container {
+                flex-direction: column; /* جعل المشغل بالأعلى والقنوات بالأسفل في الموبايل */
+                height: calc(100vh - 75px);
+            }
+
+            .player-container {
+                flex: none;
+                height: 40vh; /* تحديد حجم المشغل على الموبايل ليأخذ 40% من الشاشة */
+            }
+
+            .playlist-sidebar {
+                width: 100%; /* القائمة تأخذ العرض الكامل للموبايل */
+                flex: 1;
+                border-right: none;
+                border-top: 3px solid var(--wc-gold);
+            }
+            
+            header h1 { font-size: 18px; }
+            .wc-logo { width: 35px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- القائمة الجانبية -->
-        <div class="col-md-3 sidebar p-3">
-            <h4 class="text-danger">BODA STORE TV</h4>
-            <div id="categories"></div>
-        </div>
-        <!-- المشغل -->
-        <div class="col-md-9 p-0">
-            <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" data-setup='{}'></video>
-        </div>
-    </div>
-</div>
+    <header>
+        <!-- الرمز التعبيري للكأس كبديل ذكي وسريع للصورة لضمان التحميل الفوري -->
+        <span style="font-size: 35px;">🏆</span>
+        <h1>بث مباريات <span>كأس العالم</span> مباشر</h1>
+        <span style="font-size: 35px;">⚽</span>
+    </header>
 
-<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-<script>
-    const player = videojs('my-video');
-    
-    fetch('playlist.m3u')
-        .then(res => res.text())
-        .then(data => {
-            const lines = data.split('\n');
-            const categories = {};
+    <div class="main-container">
+        
+        <!-- منطقة مشغل الفيديو (تظهر بالأعلى في الموبايل) -->
+        <div class="player-container">
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay preload="auto">
+                <p class="vjs-no-js">مشغلك لا يدعم تشغيل هذا الفيديو</p>
+            </video>
+        </div>
+
+        <!-- القائمة الجانبية للقنوات (تظهر بالأسفل في الموبايل) -->
+        <div class="playlist-sidebar">
+            <div class="search-box">
+                <input type="text" id="searchChannel" placeholder="🔍 ابحث عن قنوات وجدول المباريات..." oninput="filterChannels()">
+            </div>
+            <ul class="channels-list" id="channelsList">
+                <li class="status-msg">⏳ جاري سحب قنوات البث من كأس العالم (playlist.m3u)...</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- مكتبات التشغيل ومعالجة البث المباشر HLS -->
+    <script src="https://zencdn.net"></script>
+    <script>
+        // تهيئة مشغل الفيديو
+        const player = videojs('my-video');
+        let allChannels = [];
+
+        // دالة جلب ملف الـ M3U المحلي تلقائياً
+        async function loadLocalPlaylist() {
+            const listContainer = document.getElementById('channelsList');
             
-            for(let i = 0; i < lines.length; i++) {
-                if(lines[i].startsWith('#EXTINF')) {
-                    const group = lines[i].match(/group-title="([^"]+)"/)[1] || "عام";
-                    const name = lines[i].split(',')[1];
-                    const url = lines[i+1];
-                    
-                    if(!categories[group]) categories[group] = [];
-                    categories[group].push({name, url});
+            try {
+                // جلب الملف من نفس المكان المتواجد به السكريبت
+                const response = await fetch('playlist.m3u');
+                
+                if (!response.ok) {
+                    throw new Error('الملف غير موجود');
+                }
+                
+                const data = await response.text();
+                parseM3u(data);
+            } catch (error) {
+                console.error(error);
+                listContainer.innerHTML = '<li class="status-msg" style="color:#ff6b6b;">⚠️ خطأ: يرجى التأكد من إضافة ملف القنوات باسم <b>playlist.m3u</b> في نفس مجلد هذا الموقع.</li>';
+            }
+        }
+
+        // دالة تحليل نص M3U واستخراج الروابط وأسماء القنوات
+        function parseM3u(text) {
+            const lines = text.split('\n');
+            allChannels = [];
+            let currentChannel = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                
+                if (line.startsWith('#EXTINF:')) {
+                    const nameIndex = line.lastIndexOf(',');
+                    const name = nameIndex !== -1 ? line.substring(nameIndex + 1).trim() : 'قناة غير معروفة';
+                    currentChannel = { name: name, url: '' };
+                } else if (line && !line.startsWith('#') && currentChannel) {
+                    currentChannel.url = line;
+                    allChannels.push(currentChannel);
+                    currentChannel = null;
                 }
             }
-            render(categories);
-        });
 
-    function render(cats) {
-        const catDiv = document.getElementById('categories');
-        for(let group in cats) {
-            catDiv.innerHTML += `<h5>${group}</h5>`;
-            cats[group].forEach(ch => {
-                catDiv.innerHTML += `<button class="btn btn-outline-light channel-btn" onclick="play('${ch.url}')">${ch.name}</button>`;
-            });
+            displayChannels(allChannels);
         }
-    }
 
-    function play(url) {
-        player.src({ src: url, type: 'application/x-mpegURL' });
-        player.play();
-    }
-</script>
-</body>
-</html>
+        // عرض القنوات في القائمة الجانبية
